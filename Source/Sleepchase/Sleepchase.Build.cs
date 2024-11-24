@@ -8,6 +8,22 @@ public class Sleepchase : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+		PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core", 
+			"CoreUObject", 
+			"Engine", 
+			"InputCore", 
+			"AIModule", 
+			"GameplayTasks", 
+			"UMG", 
+			"GameplayTags", 
+			"OnlineSubsystem", 
+			"DeveloperSettings",
+			"SignificanceManager",
+			"EnhancedInput",
+			"Niagara",
+			"CoreOnline"
+		});
 	}
 }
