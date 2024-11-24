@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "CharacterBase.generated.h"
 
+class UActionComponent;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -24,6 +25,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UCameraComponent> CameraComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
+	TObjectPtr<UActionComponent> ActionComp;
 	
 	//Input
 	UPROPERTY(EditDefaultsOnly, Category="Input")
