@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Actions/ActionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -30,6 +31,8 @@ ACharacterBase::ACharacterBase()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+
+	ActionComp=CreateDefaultSubobject<UActionComponent>(TEXT("ActionComp"));
 }
 
 
@@ -90,6 +93,9 @@ void ACharacterBase::Action_LookMouse(const FInputActionValue& InputValue)
 
 void ACharacterBase::Action_PrimaryAttack()
 {
+	static FGameplayTag ActivationTag = FGameplayTag::RequestGameplayTag("Action.PrimaryAttack");
+
+	ActionComp->StartActionByName(this,ActivationTag);
 }
 
 void ACharacterBase::Action_PrimaryInteract()
