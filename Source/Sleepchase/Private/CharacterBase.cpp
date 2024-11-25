@@ -9,6 +9,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Sleepchase/SharedGameplayTags.h"
 
 #include UE_INLINE_GENERATED_CPP_BY_NAME(CharacterBase)
 
@@ -56,39 +57,55 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	{
 		EnhancedInputComponent->BindAction(Input_LookMouse,ETriggerEvent::Triggered,this,&ACharacterBase::Action_LookMouse);
 		EnhancedInputComponent->BindAction(Input_Move,ETriggerEvent::Triggered,this,&ACharacterBase::Action_Move);
-		EnhancedInputComponent->BindAction(Input_Jump,ETriggerEvent::Triggered,this,&ACharacter::Jump);
+		EnhancedInputComponent->BindAction(Input_Jump,ETriggerEvent::Started,this,&ACharacter::Jump);
+		EnhancedInputComponent->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		
 		EnhancedInputComponent->BindAction(Input_PrimaryAttack,ETriggerEvent::Triggered,this,&ACharacterBase::Action_PrimaryAttack);
 		EnhancedInputComponent->BindAction(Input_PrimaryInteract,ETriggerEvent::Triggered,this,&ACharacterBase::Action_PrimaryInteract);
 		
 		EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Started, this, &ACharacterBase::Action_SprintStart);
 		EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Completed, this, &ACharacterBase::Action_SprintStop);
 
+		EnhancedInputComponent->BindAction(Input_SwitchGravity, ETriggerEvent::Started, this, &ACharacterBase::Action_SwitchGravityStart);
+		EnhancedInputComponent->BindAction(Input_SwitchGravity, ETriggerEvent::Completed, this, &ACharacterBase::Action_SwitchGravityStop);
+
 	}
 }
 
 void ACharacterBase::Action_Move(const FInputActionValue& InputValue)
 {
-	FRotator ControlRot = GetControlRotation();
-	//只与偏航角Yaw有关，其余设置为0
-	ControlRot.Pitch = 0.0f;
-	ControlRot.Roll = 0.0f;
+	// input is a Vector2D
+	FVector2D MovementVector = InputValue.Get<FVector2D>();
 
-	//从输入得到二维向量
-	const FVector2D AxisValue = InputValue.Get<FVector2D>();
+	if (Controller != nullptr)
+	{
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-	//前后移动
-	AddMovementInput(ControlRot.Vector(),AxisValue.Y);
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	
+		// get right vector 
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	//左右移动
-	const FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
-	AddMovementInput(RightVector,AxisValue.X);
+		// add movement 
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.X);
+	}
 }
 
 void ACharacterBase::Action_LookMouse(const FInputActionValue& InputValue)
 {
-	const FVector2d Value = InputValue.Get<FVector2d>();
-	AddControllerYawInput(Value.X);
-	AddControllerPitchInput(Value.Y);
+	// input is a Vector2D
+	FVector2D LookAxisVector = InputValue.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
 }
 
 void ACharacterBase::Action_PrimaryAttack()
@@ -108,5 +125,18 @@ void ACharacterBase::Action_SprintStart()
 
 void ACharacterBase::Action_SprintStop()
 {
+}
+
+void ACharacterBase::Action_SwitchGravityStart()
+{
+	static FGameplayTag ActivationTag = FGameplayTag::RequestGameplayTag("Action.SwitchGravity");
+	
+	ActionComp->StartActionByName(this, ActivationTag);
+}
+
+void ACharacterBase::Action_SwitchGravityStop()
+{
+	static FGameplayTag ActivationTag = FGameplayTag::RequestGameplayTag("Action.SwitchGravity");
+	ActionComp->StopActionByName(this, ActivationTag);
 }
 
