@@ -54,7 +54,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UProjectileMovementComponent> MoveComp;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	TObjectPtr<UNiagaraComponent> NiagaraLoopComp;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")

@@ -24,9 +24,9 @@ AProjectileBase::AProjectileBase()
 	SphereComp->SetCanEverAffectNavigation(false);
 	RootComponent = SphereComp;
 
-	NiagaraLoopComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("EffectComp"));
-	NiagaraLoopComp->SetupAttachment(RootComponent);
-
+	NiagaraLoopComp = CreateDefaultSubobject<UNiagaraComponent>(TEXT("NiagaraLoopComp"));
+	NiagaraLoopComp->SetupAttachment(SphereComp);
+	
 	AudioComp = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComp"));
 	AudioComp->SetupAttachment(RootComponent);
 	
