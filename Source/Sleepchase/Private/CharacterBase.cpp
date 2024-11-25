@@ -3,10 +3,13 @@
 
 #include "Sleepchase/Public/CharacterBase.h"
 
+#include "AttributeComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InteractionComponent.h"
 #include "Actions/ActionComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Sleepchase/SharedGameplayTags.h"
@@ -34,6 +37,11 @@ ACharacterBase::ACharacterBase()
 	bUseControllerRotationYaw = false;
 
 	ActionComp=CreateDefaultSubobject<UActionComponent>(TEXT("ActionComp"));
+
+	InteractionComp = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComp"));
+
+	AttributeComp = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComp"));
+
 }
 
 
@@ -71,6 +79,8 @@ void ACharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 	}
 }
+
+
 
 void ACharacterBase::Action_Move(const FInputActionValue& InputValue)
 {
@@ -117,14 +127,20 @@ void ACharacterBase::Action_PrimaryAttack()
 
 void ACharacterBase::Action_PrimaryInteract()
 {
+	if(InteractionComp)
+	{
+		InteractionComp->Interact();
+	}
 }
 
 void ACharacterBase::Action_SprintStart()
 {
+	ActionComp->StartActionByName(this, SharedGameplayTags::Action_Sprint);
 }
 
 void ACharacterBase::Action_SprintStop()
 {
+	ActionComp->StopActionByName(this, SharedGameplayTags::Action_Sprint);
 }
 
 void ACharacterBase::Action_SwitchGravityStart()
@@ -138,5 +154,40 @@ void ACharacterBase::Action_SwitchGravityStop()
 {
 	static FGameplayTag ActivationTag = FGameplayTag::RequestGameplayTag("Action.SwitchGravity");
 	ActionComp->StopActionByName(this, ActivationTag);
+}
+
+void ACharacterBase::OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth,
+	float Delta)
+{
+	if (Delta < 0.0f)
+	{
+		
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeToHitParamName, GetWorld()->TimeSeconds);
+
+		// Rage added equal to damage received (Abs to turn into positive rage number)
+		float RageDelta = FMath::Abs(Delta);
+		AttributeComp->ApplySleepy(InstigatorActor, RageDelta);
+	}
+	
+	if(Delta<0.0f && NewHealth <= 0.0f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+
+		DisableInput(PC);
+
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		SetLifeSpan(5.0f);
+		
+	}
+}
+
+void ACharacterBase::HealSelf(float amount)
+{
+	AttributeComp->ApplyHealthChanged(this,amount);
+}
+
+UCameraComponent* ACharacterBase::GetCameraComponent()
+{
+	return CameraComp;
 }
 
