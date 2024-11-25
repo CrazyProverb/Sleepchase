@@ -51,6 +51,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputAction> Input_PrimaryAttack;
 
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputAction> Input_SwitchGravity;
+
 	virtual void Action_Move(const FInputActionValue& InputValue);
 
 	virtual void Action_LookMouse(const FInputActionValue& InputValue);
@@ -62,6 +65,11 @@ protected:
 	virtual void Action_SprintStart();
 
 	virtual void Action_SprintStop();
+
+	virtual void Action_SwitchGravityStart();
+
+	virtual void Action_SwitchGravityStop();
+
 	
 public:	
 	ACharacterBase();
