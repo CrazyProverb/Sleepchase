@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "CharacterBase.generated.h"
 
+class UAttributeComponent;
+class UInteractionComponent;
 class UActionComponent;
 struct FInputActionValue;
 class UInputAction;
@@ -20,6 +22,13 @@ class SLEEPCHASE_API ACharacterBase : public ACharacter
 
 protected:
 
+	FTimerHandle PrimaryAttackTimerHandle;
+
+	float Intime;
+
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeToHitParamName;
+
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> SpringArmComp;
 
@@ -28,6 +37,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category="Components")
 	TObjectPtr<UActionComponent> ActionComp;
+
+	UPROPERTY(VisibleAnywhere,Category = "Components")
+	TObjectPtr<UInteractionComponent> InteractionComp;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly,Category = "Components")
+	TObjectPtr<UAttributeComponent> AttributeComp;
+	
 	
 	//Input
 	UPROPERTY(EditDefaultsOnly, Category="Input")
@@ -71,9 +87,17 @@ protected:
 	virtual void Action_SwitchGravityStop();
 
 	
+	
 public:	
 	ACharacterBase();
 	
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION()
+	virtual void OnHealthChanged(AActor* InstigatorActor, UAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+	UFUNCTION(Exec)
+	void HealSelf(float amount = 100);
+
+	UCameraComponent* GetCameraComponent();
 };
