@@ -32,9 +32,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Effects")
 	TObjectPtr<UParticleSystem> ImpactVFX;
 
-	UPROPERTY(EditAnywhere, Category="Effects")
-	TObjectPtr<UNiagaraComponent> ImpactVFXComp;
-
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	USoundBase* CastingSound;
 
