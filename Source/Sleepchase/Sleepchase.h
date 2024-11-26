@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 
+#define COLLISION_PROJECTILE ECC_GameTraceChannel1
+
+
 static void LogOnScreen(UObject* WorldContext, FString Msg, FColor Color = FColor::White, float Duration = 5.0f)
 {
 	if (!ensure(WorldContext))
