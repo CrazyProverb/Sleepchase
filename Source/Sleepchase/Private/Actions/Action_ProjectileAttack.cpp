@@ -3,6 +3,8 @@
 
 #include "Actions/Action_ProjectileAttack.h"
 
+#include "CharacterBase.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sleepchase/Sleepchase.h"
@@ -26,7 +28,7 @@ void UAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 		//Character->PlayAnimMontage(AttackAnim);
 		
 		//UGameplayStatics::SpawnEmitterAttached(ImpactVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator,
-			//EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+		//EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
 		
 		UGameplayStatics::SpawnSoundAttached(CastingSound, Character->GetMesh());
 		
@@ -63,10 +65,26 @@ void UAction_ProjectileAttack::AttackDelay_Elapsed(ACharacter* InstigatorCharact
 		
 		
 
-		APlayerCameraManager* CurrentCamera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
+		/*APlayerCameraManager* CurrentCamera = GetWorld()->GetFirstPlayerController()->PlayerCameraManager;
 		FVector TraceDirection = CurrentCamera->GetActorForwardVector();
 		FVector TraceStart = CurrentCamera->GetCameraLocation();
 		FVector TraceEnd = TraceStart + (TraceDirection * 5000);
+		FVector AdjustedTraceEnd = TraceEnd;*/
+
+		//获得Cameracomponent
+		/*TObjectPtr<ACharacterBase> Player = Cast<ACharacterBase>(InstigatorCharacter);
+		UCameraComponent * CameraComp = Player->GetCameraComponent();
+		const FVector TraceStart = CameraComp->GetComponentLocation();
+		// endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
+		const FVector TraceEnd = CameraComp->GetComponentLocation() + (Player->GetControlRotation().Vector() * 5000);
+		FVector AdjustedTraceEnd = TraceEnd;*/
+
+		FVector TraceDirection = InstigatorCharacter->GetControlRotation().Vector();
+
+		// Add sweep radius onto start to avoid the sphere clipping into floor/walls the camera is directly against.
+		const FVector TraceStart = InstigatorCharacter->GetPawnViewLocation() + (TraceDirection * SweepRadius);
+		// endpoint far into the look-at distance (not too far, still adjust somewhat towards crosshair on a miss)
+		const FVector TraceEnd = TraceStart + (TraceDirection * SweepDistanceFallback);
 		FVector AdjustedTraceEnd = TraceEnd;
 
 		TArray<FHitResult> Hits;
