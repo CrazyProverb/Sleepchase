@@ -25,10 +25,10 @@ void UAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 
 	if(TObjectPtr<ACharacter> Character = Cast<ACharacter>(Instigator))
 	{
-		//Character->PlayAnimMontage(AttackAnim);
+		Character->PlayAnimMontage(AttackAnim);
 		
-		//UGameplayStatics::SpawnEmitterAttached(ImpactVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator,
-		//EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+		UGameplayStatics::SpawnEmitterAttached(ImpactVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator,
+		EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
 		
 		UGameplayStatics::SpawnSoundAttached(CastingSound, Character->GetMesh());
 		
