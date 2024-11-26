@@ -12,17 +12,34 @@
 
 ADashProjectile::ADashProjectile()
 {
+	//传送延迟
 	TeleportDelay = 0.2f;
+	//引爆延迟
 	DetonateDelay = 0.2f;
 
+	InitialLifeSpan = 0.6f;
 	MoveComp->InitialSpeed = 6000.f;
 }
 
 void ADashProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ADashProjectile::Explode, DetonateDelay);
+	//GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ADashProjectile::Explode, DetonateDelay);
 }
+
+void ADashProjectile::OnActorHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
+{
+	if((OtherActor!=nullptr) && (OtherActor != this) && (OtherComp != nullptr))
+	{
+		if( OtherComp->IsSimulatingPhysics())
+		{
+			OtherComp->AddImpulseAtLocation(GetVelocity()*120.0f, GetActorLocation());
+		}
+		ADashProjectile::Explode_Implementation();
+	}
+}
+
 
 void ADashProjectile::Explode_Implementation()
 {

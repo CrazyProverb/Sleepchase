@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraComponent.h"
 #include "Actions/Action.h"
 #include "Action_ProjectileAttack.generated.h"
 
@@ -30,6 +31,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Effects")
 	TObjectPtr<UParticleSystem> ImpactVFX;
+
+	UPROPERTY(EditAnywhere, Category="Effects")
+	TObjectPtr<UNiagaraComponent> ImpactVFXComp;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	USoundBase* CastingSound;

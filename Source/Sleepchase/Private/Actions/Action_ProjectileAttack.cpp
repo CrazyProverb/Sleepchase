@@ -25,8 +25,9 @@ void UAction_ProjectileAttack::StartAction_Implementation(AActor* Instigator)
 	{
 		//Character->PlayAnimMontage(AttackAnim);
 		
-		UGameplayStatics::SpawnEmitterAttached(ImpactVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator,
-			EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+		//UGameplayStatics::SpawnEmitterAttached(ImpactVFX, Character->GetMesh(), HandSocketName, FVector::ZeroVector, FRotator::ZeroRotator,
+			//EAttachLocation::SnapToTarget, true, EPSCPoolMethod::AutoRelease);
+		
 		UGameplayStatics::SpawnSoundAttached(CastingSound, Character->GetMesh());
 		
 		FTimerHandle TimerHandle_AttackDelay;
